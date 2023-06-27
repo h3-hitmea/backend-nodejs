@@ -4,9 +4,11 @@ import UserMaterialService from '../services/UserMaterial';
 class UserMaterial {
 	public async create(request, reply) {
 		try {
-			const data = request.body as Prisma.UserMaterialCreateInput;
-
-			const material = await UserMaterialService.create(data);
+			const user = request.user;
+			const material = await UserMaterialService.create({
+				userId: user.id,
+				materialId: request.body.materialId,
+			});
 			return material;
 		} catch (error) {
 			console.error(error);
@@ -16,7 +18,8 @@ class UserMaterial {
 
 	public async findAll(req, res) {
 		try {
-			const userMaterials = await UserMaterialService.findAll();
+			const user = req.user;
+			const userMaterials = await UserMaterialService.findAll(user.id);
 			return userMaterials;
 		} catch (error) {
 			console.error(error);

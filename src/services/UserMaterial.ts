@@ -25,8 +25,12 @@ class UserMaterialService {
 		return userMaterial;
 	}
 
-	async findAll() {
-		const userMaterials = await prisma.userMaterial.findMany();
+	async findAll(userId: string) {
+		const userMaterials = await prisma.userMaterial.findMany({
+			where: {
+				userId: userId,
+			},
+		});
 		return userMaterials;
 	}
 

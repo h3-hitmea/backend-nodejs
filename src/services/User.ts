@@ -16,7 +16,11 @@ class UserService {
 		return user;
 	}
 	async findAll() {
-		const users = await prisma.user.findMany();
+		const users = await prisma.user.findMany({
+			where: {
+				deletedAt: null,
+			},
+		});
 		return users;
 	}
 	async findOne(id: string) {
