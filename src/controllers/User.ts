@@ -1,8 +1,7 @@
-import { StatusCodes } from 'http-status-codes';
 import { Prisma } from '@prisma/client';
-import UserService from '../services/User';
-import { FastifyReply, FastifyRequest } from 'fastify';
 import fs from 'fs';
+import { StatusCodes } from 'http-status-codes';
+import UserService from '../services/User';
 
 class User {
 	public async create(request, reply) {

@@ -42,6 +42,7 @@ model UserMaterial {
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
     deletedAt  DateTime? @default(now())
+    // @@index([userId, materialId])
 
     @@unique([userId, materialId])
 }

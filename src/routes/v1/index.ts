@@ -3,6 +3,7 @@ import AuthController from '../../controllers/Auth';
 import multerUpload from '../../config/multer';
 import UserController from '../../controllers/User';
 import MaterialController from '../../controllers/Material';
+import UserMaterialController from '../../controllers/UserMaterial';
 
 const routes = async (app, options: FastifyPluginOptions) => {
 	app.post('/auth/login', (req, res, next) => AuthController.login(req, res, next, app));
@@ -35,6 +36,24 @@ const routes = async (app, options: FastifyPluginOptions) => {
 	// *********************************************************************************************************************
 
 	app.get('/material', MaterialController.findAll);
+	app.get('/material/:id', MaterialController.findOne);
+
+	// *********************************************************************************************************************
+	app.get(
+		'/user-material',
+		{ onRequest: [app.authorization] },
+		UserMaterialController.findAll
+	);
+	app.post(
+		'/user-material/create',
+		{ onRequest: [app.authorization] },
+		UserMaterialController.create
+	);
+	app.delete(
+		'/user-material/delete',
+		{ onRequest: [app.authorization] },
+		UserMaterialController.delete
+	);
 };
 
 export default routes;

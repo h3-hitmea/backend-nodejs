@@ -22,10 +22,9 @@ export default function buildServer() {
 		try {
 			// Authenticate user
 			await request.jwtVerify();
-
 			const user = await UserServiceInstance.findByEmail(request.user.email);
 
-			if (user.is_active || user.is_deleted) {
+			if (!user.is_active || user.is_deleted) {
 				reply.status(StatusCodes.FORBIDDEN).send(ReasonPhrases.FORBIDDEN);
 			}
 		} catch (err) {
