@@ -47,6 +47,7 @@ class UserService {
 		});
 		return products;
 	}
+
 	async update(id: string, data: Prisma.UserUpdateInput) {
 		if (data.password) {
 			data.password = await hashPassword(data.password as string);
@@ -60,6 +61,7 @@ class UserService {
 		delete user.password;
 		return user;
 	}
+
 	async delete(id: string) {
 		const user = await prisma.user.delete({
 			where: {

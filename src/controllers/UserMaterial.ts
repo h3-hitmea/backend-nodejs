@@ -40,7 +40,9 @@ class UserMaterial {
 
 	public async delete(req, res) {
 		try {
-			const { userId, materialId } = req.body;
+			const { materialId } = req.body;
+			const userId = req.user.id;
+
 			const material = await UserMaterialService.delete(userId, materialId);
 			return material;
 		} catch (err) {
