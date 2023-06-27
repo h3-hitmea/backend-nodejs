@@ -6,6 +6,10 @@ import MaterialController from '../../controllers/Material';
 import UserMaterialController from '../../controllers/UserMaterial';
 
 const routes = async (app, options: FastifyPluginOptions) => {
+	app.get('/', (req, res, next) => res.send({ message: 'Hitema Maxairain V1 API is ON' }));
+
+	// *********************************************************************************************************************
+
 	app.post('/auth/login', (req, res, next) => AuthController.login(req, res, next, app));
 	app.post('/auth/logout', { preHandler: [app.authorization] }, (req, res, next) =>
 		AuthController.logout(req, res, next, app)
