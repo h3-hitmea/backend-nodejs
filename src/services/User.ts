@@ -2,15 +2,18 @@ import fs from 'fs';
 import { Prisma } from '@prisma/client';
 import prisma from '../database';
 import { hashPassword } from './hashServices';
-
+import _ from 'lodash';
 class UserService {
 	async create(data: Prisma.UserCreateInput) {
+		// const isFacialRecognition = _.isEmpty(data.password) ? true : false;
+		// const signUpMethod = isFacialRecognition ? {password : data.password} : {descriptor: data.descriptor}
 		const user = await prisma.user.create({
 			data: {
 				email: data.email,
 				name: data.name,
 				lastName: data.lastName,
-				password: await hashPassword(data.password),
+				descriptor: data.descriptor,
+				// password: await hashPassword(data.password),
 			},
 		});
 		return user;

@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
 import UserServiceInstance from '../services/User';
 import { StatusCodes } from 'http-status-codes';
+import { calculateEuclideanDistance } from '../helpers/faceRecongnition';
 
 class Auth {
 	public login = async (request, reply, done, app) => {
 		try {
-			const { email, password, remember_me } = request.body;
+			const { email, password, descriptor } = request.body;
 			const user = await UserServiceInstance.findByEmail(email);
 
 			if (!user) {
@@ -20,13 +21,25 @@ class Auth {
 				throw new Error('User is not active');
 			}
 
-			const isPasswordValid = await bcrypt.compare(password, user.password);
+			const descriptor1 = new Float32Array(JSON.parse(user.descriptor));
+			const descriptor2 = new Float32Array(JSON.parse(descriptor));
+			const threshold = 0.6;
 
-			if (!isPasswordValid) {
-				throw new Error('Wrong password');
+			// Calculate the Euclidean distance between descriptors
+			const distance = calculateEuclideanDistance(descriptor1, descriptor2);
+			console.log('distance', distance);
+
+			// Compare with the threshold to determine if they are a match
+			if (distance < threshold) {
+				console.log('It is the same person.');
+				const { password: _, ...userData } = user;
+				const token = app.jwt.sign(userData, { expiresIn: '1h' });
+				reply.status(StatusCodes.ACCEPTED).send({ token });
+			} else {
+				throw new Error('This is not the same person');
 			}
 
-			const { password: _, ...userData } = user;
+			const { ...userData } = user;
 			const token = app.jwt.sign(userData, { expiresIn: '1h' });
 			reply.status(StatusCodes.ACCEPTED).send({ token });
 		} catch (error) {

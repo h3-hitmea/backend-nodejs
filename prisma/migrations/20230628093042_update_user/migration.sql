@@ -1,11 +1,14 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
+    "name" TEXT,
+    "lastName" TEXT,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "photo" TEXT,
+    "descriptor" TEXT DEFAULT '',
+    "is_deleted" BOOLEAN NOT NULL DEFAULT false,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -17,8 +20,9 @@ CREATE TABLE "User" (
 CREATE TABLE "Material" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT DEFAULT '',
     "photo" TEXT,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
