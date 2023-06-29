@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 import UserServiceInstance from '../services/User';
 import { StatusCodes } from 'http-status-codes';
-import { calculateEuclideanDistance } from '../helpers/faceRecongnition';
+import { calculateEuclideanDistance, isSamePerson } from '../helpers/faceRecongnition';
+import _ from 'lodash';
 
 class Auth {
 	public login = async (request, reply, done, app) => {
@@ -21,27 +22,27 @@ class Auth {
 				throw new Error('User is not active');
 			}
 
-			const descriptor1 = new Float32Array(JSON.parse(user.descriptor));
-			const descriptor2 = new Float32Array(JSON.parse(descriptor));
-			const threshold = 0.6;
-
-			// Calculate the Euclidean distance between descriptors
-			const distance = calculateEuclideanDistance(descriptor1, descriptor2);
-			console.log('distance', distance);
-
-			// Compare with the threshold to determine if they are a match
-			if (distance < threshold) {
-				console.log('It is the same person.');
-				const { password: _, ...userData } = user;
-				const token = app.jwt.sign(userData, { expiresIn: '1h' });
-				reply.status(StatusCodes.ACCEPTED).send({ token });
-			} else {
-				throw new Error('This is not the same person');
+			let isPasswordValid = false;
+			if (!_.isEmpty(password)) {
+				isPasswordValid = await bcrypt.compare(password, user.password);
+				if (!isPasswordValid) {
+					throw new Error('Password is invalid');
+				}
 			}
 
-			const { ...userData } = user;
-			const token = app.jwt.sign(userData, { expiresIn: '1h' });
-			reply.status(StatusCodes.ACCEPTED).send({ token });
+			let isTheSamePerson = false;
+			if (!_.isEmpty(descriptor) && _.isEmpty(password)) {
+				isTheSamePerson = isSamePerson(user.descriptor, descriptor);
+				if (!isTheSamePerson) {
+					throw new Error('This is not the same person');
+				}
+			}
+
+			if (isTheSamePerson || isPasswordValid) {
+				const { password, descriptor, ...userData } = user; // Exclude password and descriptor from the response
+				const token = app.jwt.sign(userData, { expiresIn: '1h' });
+				reply.status(StatusCodes.ACCEPTED).send({ token });
+			}
 		} catch (error) {
 			reply.status(StatusCodes.FORBIDDEN).send({ text: error.message });
 		}

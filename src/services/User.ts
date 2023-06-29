@@ -5,12 +5,19 @@ import { hashPassword } from './hashServices';
 import _ from 'lodash';
 class UserService {
 	async create(data: Prisma.UserCreateInput) {
+		const isFacialRecognition =
+			_.isEmpty(data.password) && !_.isNull(data.password) ? true : false;
+
+		const signUpMethod = isFacialRecognition
+			? { descriptor: data.descriptor }
+			: { password: await hashPassword(data.password) };
+
 		const user = await prisma.user.create({
 			data: {
 				email: data.email,
 				name: data.name,
 				lastName: data.lastName,
-				descriptor: data.descriptor,
+				...signUpMethod,
 			},
 		});
 		return user;

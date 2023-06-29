@@ -11,3 +11,20 @@ export function calculateEuclideanDistance(descriptor1, descriptor2) {
 
 	return Math.sqrt(sumOfSquares);
 }
+
+export function isSamePerson(descriptorOne, descriptorTwo) {
+	const descriptor1 = new Float32Array(JSON.parse(descriptorOne));
+	const descriptor2 = new Float32Array(JSON.parse(descriptorTwo));
+	const threshold = 0.6;
+
+	// Calculate the Euclidean distance between descriptors
+	const distance = calculateEuclideanDistance(descriptor1, descriptor2);
+	console.log('distance', distance);
+
+	// Compare with the threshold to determine if they are a match
+	if (distance < threshold) {
+		console.log('It is the same person.');
+		return true;
+	}
+	return false;
+}
