@@ -8,7 +8,7 @@ class User {
 		try {
 			const data = request.body as Prisma.UserCreateInput;
 
-			const user = await UserService.create(data);
+			const user = await UserService.create(data, request.files);
 			return user;
 		} catch (error) {
 			console.error(error);

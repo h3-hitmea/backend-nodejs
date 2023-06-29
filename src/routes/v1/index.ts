@@ -25,14 +25,10 @@ const routes = async (app, options: FastifyPluginOptions) => {
 		UserController.findProductsByUser
 	);
 	// onRequest: [app.authorization],
-	app.post(
-		'/user',
-		{ preHandler: multerUpload.single('profile-photo') },
-		UserController.create
-	);
+	app.post('/user', { preHandler: multerUpload.single('photo') }, UserController.create);
 	app.patch(
 		'/user/:id',
-		{ onRequest: [app.authorization], preHandler: multerUpload.single('profile-photo') },
+		{ onRequest: [app.authorization], preHandler: multerUpload.single('photo') },
 		UserController.update
 	);
 	app.delete('/user/:id', { onRequest: [app.authorization] }, UserController.delete);

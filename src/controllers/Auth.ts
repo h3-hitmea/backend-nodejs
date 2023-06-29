@@ -3,11 +3,14 @@ import UserServiceInstance from '../services/User';
 import { StatusCodes } from 'http-status-codes';
 import { calculateEuclideanDistance, isSamePerson } from '../helpers/faceRecongnition';
 import _ from 'lodash';
+import sdk from 'api';
+import { EDENAI_API_KEY, EDENAI_URL } from '../config';
+import FormData from 'form-data';
 
 class Auth {
 	public login = async (request, reply, done, app) => {
 		try {
-			const { email, password, descriptor } = request.body;
+			const { email, password, descriptor, authFromTelephone } = request.body;
 			const user = await UserServiceInstance.findByEmail(email);
 
 			if (!user) {
@@ -31,11 +34,28 @@ class Auth {
 			}
 
 			let isTheSamePerson = false;
-			if (!_.isEmpty(descriptor) && _.isEmpty(password)) {
+			if (!_.isEmpty(descriptor) && _.isEmpty(password) && !authFromTelephone) {
 				isTheSamePerson = isSamePerson(user.descriptor, descriptor);
 				if (!isTheSamePerson) {
 					throw new Error('This is not the same person');
 				}
+			}
+
+			if (authFromTelephone) {
+				const sdk = require('api')('@eden-ai/v2.0#4jl9a10uljh5byx8');
+
+				sdk.auth(EDENAI_API_KEY);
+				sdk.image_face_compare_create({
+					response_as_dict: true,
+					attributes_as_list: false,
+					show_original_response: false,
+					providers: 'facepp',
+					file1_url: 'http://localhost:3001/public/images/photo-1688050607361.jpg',
+					file2_url:
+						'http://localhost:3001/public/images/b01ef856-353d-44a4-9620-e8ddcb0af90a.jpg',
+				})
+					.then(({ data }) => console.log(data))
+					.catch((err) => console.error(err.data.error.message));
 			}
 
 			if (isTheSamePerson || isPasswordValid) {

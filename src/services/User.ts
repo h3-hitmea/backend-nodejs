@@ -3,8 +3,9 @@ import { Prisma } from '@prisma/client';
 import prisma from '../database';
 import { hashPassword } from './hashServices';
 import _ from 'lodash';
+import { randomUUID } from 'crypto';
 class UserService {
-	async create(data: Prisma.UserCreateInput) {
+	async create(data, files = []) {
 		const isFacialRecognition =
 			_.isEmpty(data.password) && !_.isNull(data.password) ? true : false;
 
@@ -12,11 +13,21 @@ class UserService {
 			? { descriptor: data.descriptor }
 			: { password: await hashPassword(data.password) };
 
+		let photo: string | null = null;
+
+		// photo management
+
+		if (!_.isEmpty(files)) {
+			photo = files[0].filename;
+		}
+
+		console.log(photo);
 		const user = await prisma.user.create({
 			data: {
 				email: data.email,
 				name: data.name,
 				lastName: data.lastName,
+				photo,
 				...signUpMethod,
 			},
 		});

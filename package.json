@@ -16,11 +16,13 @@
 		"@prisma/client": "^4.16.1",
 		"@prisma/studio": "^0.484.0",
 		"@types/node": "^18.16.3",
+		"api": "^6.0.0",
 		"bcrypt": "^5.1.0",
 		"dotenv": "^16.0.3",
 		"fastify": "^4.17.0",
 		"fastify-multer": "^2.0.3",
 		"fastify-plugin": "^4.5.0",
+		"form-data": "^4.0.0",
 		"http-status-codes": "^2.2.0",
 		"jsonwebtoken": "^9.0.0",
 		"pino-pretty": "^10.0.0"
