@@ -3,9 +3,7 @@ import UserServiceInstance from '../services/User';
 import { StatusCodes } from 'http-status-codes';
 import { calculateEuclideanDistance, isSamePerson } from '../helpers/faceRecongnition';
 import _ from 'lodash';
-import sdk from 'api';
 import { EDENAI_API_KEY, EDENAI_URL } from '../config';
-import FormData from 'form-data';
 
 class Auth {
 	public login = async (request, reply, done, app) => {
@@ -45,17 +43,24 @@ class Auth {
 				const sdk = require('api')('@eden-ai/v2.0#4jl9a10uljh5byx8');
 
 				sdk.auth(EDENAI_API_KEY);
-				sdk.image_face_compare_create({
+				const data = await sdk.image_face_compare_create({
 					response_as_dict: true,
 					attributes_as_list: false,
 					show_original_response: false,
 					providers: 'facepp',
-					file1_url: 'http://localhost:3001/public/images/photo-1688050607361.jpg',
+					file1_url:
+						'https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/b01ef856-353d-44a4-9620-e8ddcb0af90a.jpg',
 					file2_url:
-						'http://localhost:3001/public/images/b01ef856-353d-44a4-9620-e8ddcb0af90a.jpg',
-				})
-					.then(({ data }) => console.log(data))
-					.catch((err) => console.error(err.data.error.message));
+						'https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/photo-1688050607361.jpg',
+				});
+				const confidence = data;
+				const { status } = confidence.data?.facepp;
+
+				if (status === 'fail') {
+					throw new Error('Face recognition failed, CONCURRENCY_LIMIT_EXCEEDED');
+				} else if (confidence.data?.facepp?.items[0].confidence > 0.8) {
+					isTheSamePerson = true;
+				}
 			}
 
 			if (isTheSamePerson || isPasswordValid) {
