@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _fastifyMulter = _interopRequireDefault(require("fastify-multer"));
 var _path = _interopRequireDefault(require("path"));
-var _app = require("../../dist/app");
+var _crypto = require("crypto");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var limits = {
   fileSize: 1024 * 1024 * 5
@@ -14,11 +14,12 @@ var limits = {
 
 var storage = _fastifyMulter["default"].diskStorage({
   destination: function destination(req, file, cb) {
-    cb(null, _app.PUBLIC_PATH);
+    var fileLocation = _path["default"].join(__dirname, '..', 'uploads', 'images');
+    cb(null, fileLocation);
   },
   filename: function filename(req, file, cb) {
     var fileExt = _path["default"].extname(file.originalname);
-    var filename = file.fieldname + "-" + Date.now() + fileExt;
+    var filename = (0, _crypto.randomUUID)() + fileExt;
     cb(null, filename);
   }
 });

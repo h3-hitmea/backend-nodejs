@@ -9,6 +9,7 @@ var _User = _interopRequireDefault(require("../services/User"));
 var _httpStatusCodes = require("http-status-codes");
 var _faceRecongnition = require("../helpers/faceRecongnition");
 var _lodash = _interopRequireDefault(require("lodash"));
+var _config = require("../config");
 var _excluded = ["password", "descriptor"];
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
@@ -27,12 +28,12 @@ var Auth = /*#__PURE__*/_createClass(function Auth() {
   _classCallCheck(this, Auth);
   _defineProperty(this, "login", /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(request, reply, done, app) {
-      var _request$body, email, password, descriptor, user, isPasswordValid, isTheSamePerson, _password, _descriptor, userData, token;
+      var _request$body, email, password, descriptor, authFromTelephone, user, isPasswordValid, isTheSamePerson, _confidence$data, _confidence$data2, _confidence$data3, _confidence$data3$fac, sdk, data, confidence, _confidence$data$face, status, _password, _descriptor, userData, token;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            _request$body = request.body, email = _request$body.email, password = _request$body.password, descriptor = _request$body.descriptor;
+            _request$body = request.body, email = _request$body.email, password = _request$body.password, descriptor = _request$body.descriptor, authFromTelephone = _request$body.authFromTelephone;
             _context.next = 4;
             return _User["default"].findByEmail(email);
           case 4:
@@ -71,7 +72,7 @@ var Auth = /*#__PURE__*/_createClass(function Auth() {
             throw new Error('Password is invalid');
           case 18:
             isTheSamePerson = false;
-            if (!(!_lodash["default"].isEmpty(descriptor) && _lodash["default"].isEmpty(password))) {
+            if (!(!_lodash["default"].isEmpty(descriptor) && _lodash["default"].isEmpty(password) && (!authFromTelephone || !_lodash["default"].isEmpty(authFromTelephone)))) {
               _context.next = 23;
               break;
             }
@@ -82,6 +83,37 @@ var Auth = /*#__PURE__*/_createClass(function Auth() {
             }
             throw new Error('This is not the same person');
           case 23:
+            if (!(authFromTelephone || authFromTelephone === 'true')) {
+              _context.next = 38;
+              break;
+            }
+            sdk = require('api')('@eden-ai/v2.0#4jl9a10uljh5byx8');
+            console.log('here authFromTelephone');
+            sdk.auth(_config.EDENAI_API_KEY);
+            _context.next = 29;
+            return sdk.image_face_compare_create({
+              response_as_dict: true,
+              attributes_as_list: false,
+              show_original_response: false,
+              providers: 'facepp',
+              file1_url: "https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/".concat(request.file.filename),
+              file2_url: "https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/".concat(user.photo)
+            });
+          case 29:
+            data = _context.sent;
+            confidence = data;
+            _confidence$data$face = (_confidence$data = confidence.data) === null || _confidence$data === void 0 ? void 0 : _confidence$data.facepp, status = _confidence$data$face.status;
+            console.log((_confidence$data2 = confidence.data) === null || _confidence$data2 === void 0 ? void 0 : _confidence$data2.facepp);
+            if (!(status === 'fail')) {
+              _context.next = 37;
+              break;
+            }
+            throw new Error('Face recognition failed, CONCURRENCY_LIMIT_EXCEEDED');
+          case 37:
+            if (((_confidence$data3 = confidence.data) === null || _confidence$data3 === void 0 ? void 0 : (_confidence$data3$fac = _confidence$data3.facepp) === null || _confidence$data3$fac === void 0 ? void 0 : _confidence$data3$fac.items[0].confidence) > 0.8) {
+              isTheSamePerson = true;
+            }
+          case 38:
             if (isTheSamePerson || isPasswordValid) {
               _password = user.password, _descriptor = user.descriptor, userData = _objectWithoutProperties(user, _excluded); // Exclude password and descriptor from the response
               token = app.jwt.sign(userData, {
@@ -91,19 +123,19 @@ var Auth = /*#__PURE__*/_createClass(function Auth() {
                 token: token
               });
             }
-            _context.next = 29;
+            _context.next = 44;
             break;
-          case 26:
-            _context.prev = 26;
+          case 41:
+            _context.prev = 41;
             _context.t0 = _context["catch"](0);
             reply.status(_httpStatusCodes.StatusCodes.FORBIDDEN).send({
               text: _context.t0.message
             });
-          case 29:
+          case 44:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[0, 26]]);
+      }, _callee, null, [[0, 41]]);
     }));
     return function (_x, _x2, _x3, _x4) {
       return _ref.apply(this, arguments);

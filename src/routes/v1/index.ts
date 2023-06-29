@@ -10,7 +10,9 @@ const routes = async (app, options: FastifyPluginOptions) => {
 
 	// *********************************************************************************************************************
 
-	app.post('/auth/login', (req, res, next) => AuthController.login(req, res, next, app));
+	app.post('/auth/login', { preHandler: multerUpload.single('photo') }, (req, res, next) =>
+		AuthController.login(req, res, next, app)
+	);
 	app.post('/auth/logout', { preHandler: [app.authorization] }, (req, res, next) =>
 		AuthController.logout(req, res, next, app)
 	);

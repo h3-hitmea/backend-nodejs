@@ -1,11 +1,10 @@
-import fs from 'fs';
 import { Prisma } from '@prisma/client';
 import prisma from '../database';
 import { hashPassword } from './hashServices';
 import _ from 'lodash';
-import { randomUUID } from 'crypto';
+
 class UserService {
-	async create(data, files = []) {
+	async create(data, file = {} as any) {
 		const isFacialRecognition =
 			_.isEmpty(data.password) && !_.isNull(data.password) ? true : false;
 
@@ -17,11 +16,12 @@ class UserService {
 
 		// photo management
 
-		if (!_.isEmpty(files)) {
-			photo = files[0].filename;
+		if (!_.isEmpty(file)) {
+			console.log(file);
+			photo = file.filename;
 		}
 
-		console.log(photo);
+		console.log({ file: file });
 		const user = await prisma.user.create({
 			data: {
 				email: data.email,

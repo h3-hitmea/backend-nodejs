@@ -31,21 +31,24 @@ var User = /*#__PURE__*/function () {
             case 0:
               _context.prev = 0;
               data = request.body;
-              _context.next = 4;
-              return _User["default"].create(data);
-            case 4:
+              console.log({
+                request: request
+              });
+              _context.next = 5;
+              return _User["default"].create(data, request.file);
+            case 5:
               user = _context.sent;
               return _context.abrupt("return", user);
-            case 8:
-              _context.prev = 8;
+            case 9:
+              _context.prev = 9;
               _context.t0 = _context["catch"](0);
               console.error(_context.t0);
               throw new Error(_context.t0);
-            case 12:
+            case 13:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[0, 8]]);
+        }, _callee, null, [[0, 9]]);
       }));
       function create(_x, _x2) {
         return _create.apply(this, arguments);

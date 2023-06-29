@@ -32,30 +32,32 @@ class Auth {
 			}
 
 			let isTheSamePerson = false;
-			if (!_.isEmpty(descriptor) && _.isEmpty(password) && !authFromTelephone) {
+			if (
+				!_.isEmpty(descriptor) &&
+				_.isEmpty(password) &&
+				(!authFromTelephone || !_.isEmpty(authFromTelephone))
+			) {
 				isTheSamePerson = isSamePerson(user.descriptor, descriptor);
 				if (!isTheSamePerson) {
 					throw new Error('This is not the same person');
 				}
 			}
 
-			if (authFromTelephone) {
+			if (authFromTelephone || authFromTelephone === 'true') {
 				const sdk = require('api')('@eden-ai/v2.0#4jl9a10uljh5byx8');
-
+				console.log('here authFromTelephone');
 				sdk.auth(EDENAI_API_KEY);
 				const data = await sdk.image_face_compare_create({
 					response_as_dict: true,
 					attributes_as_list: false,
 					show_original_response: false,
 					providers: 'facepp',
-					file1_url:
-						'https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/b01ef856-353d-44a4-9620-e8ddcb0af90a.jpg',
-					file2_url:
-						'https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/photo-1688050607361.jpg',
+					file1_url: `https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/${request.file.filename}`,
+					file2_url: `https://h3-hitmea-backend-nodejs-test.onrender.com/public/images/${user.photo}`,
 				});
 				const confidence = data;
 				const { status } = confidence.data?.facepp;
-
+				console.log(confidence.data?.facepp);
 				if (status === 'fail') {
 					throw new Error('Face recognition failed, CONCURRENCY_LIMIT_EXCEEDED');
 				} else if (confidence.data?.facepp?.items[0].confidence > 0.8) {

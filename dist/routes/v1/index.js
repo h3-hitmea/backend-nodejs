@@ -27,7 +27,9 @@ var routes = /*#__PURE__*/function () {
 
           // *********************************************************************************************************************
 
-          app.post('/auth/login', function (req, res, next) {
+          app.post('/auth/login', {
+            preHandler: _multer["default"].single('photo')
+          }, function (req, res, next) {
             return _Auth["default"].login(req, res, next, app);
           });
           app.post('/auth/logout', {
@@ -49,11 +51,11 @@ var routes = /*#__PURE__*/function () {
           }, _User["default"].findProductsByUser);
           // onRequest: [app.authorization],
           app.post('/user', {
-            preHandler: _multer["default"].single('profile-photo')
+            preHandler: _multer["default"].single('photo')
           }, _User["default"].create);
           app.patch('/user/:id', {
             onRequest: [app.authorization],
-            preHandler: _multer["default"].single('profile-photo')
+            preHandler: _multer["default"].single('photo')
           }, _User["default"].update);
           app["delete"]('/user/:id', {
             onRequest: [app.authorization]

@@ -28,42 +28,57 @@ var UserService = /*#__PURE__*/function () {
     key: "create",
     value: function () {
       var _create = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(data) {
-        var isFacialRecognition, signUpMethod, user;
+        var file,
+          isFacialRecognition,
+          signUpMethod,
+          photo,
+          user,
+          _args = arguments;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              file = _args.length > 1 && _args[1] !== undefined ? _args[1] : {};
               isFacialRecognition = _lodash["default"].isEmpty(data.password) && !_lodash["default"].isNull(data.password) ? true : false;
               if (!isFacialRecognition) {
-                _context.next = 5;
+                _context.next = 6;
                 break;
               }
               _context.t0 = {
                 descriptor: data.descriptor
               };
-              _context.next = 9;
+              _context.next = 10;
               break;
-            case 5:
-              _context.next = 7;
+            case 6:
+              _context.next = 8;
               return (0, _hashServices.hashPassword)(data.password);
-            case 7:
+            case 8:
               _context.t1 = _context.sent;
               _context.t0 = {
                 password: _context.t1
               };
-            case 9:
+            case 10:
               signUpMethod = _context.t0;
-              _context.next = 12;
+              photo = null; // photo management
+              if (!_lodash["default"].isEmpty(file)) {
+                console.log(file);
+                photo = file.filename;
+              }
+              console.log({
+                file: file
+              });
+              _context.next = 16;
               return _database["default"].user.create({
                 data: _objectSpread({
                   email: data.email,
                   name: data.name,
-                  lastName: data.lastName
+                  lastName: data.lastName,
+                  photo: photo
                 }, signUpMethod)
               });
-            case 12:
+            case 16:
               user = _context.sent;
               return _context.abrupt("return", user);
-            case 14:
+            case 18:
             case "end":
               return _context.stop();
           }
